@@ -245,6 +245,7 @@ void search() {
     } while (temp != first);
     
     printf("Song not found.\n");
+    system("CLS");
 }
 
 
@@ -292,10 +293,6 @@ void next() {
     while (temp->next != first) {
         if (strcmp(name, temp->name) == 0) {
             nexts = temp->next;
-            
-//            if (nexts == first) {
-//                nexts = nextSong->next; 
-//            }
             
             if (nexts != NULL) {
                 printf("\nNext song info: \n");
