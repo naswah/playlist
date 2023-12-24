@@ -1,5 +1,4 @@
 #include<stdio.h>
-#include<conio.h>
 #include<stdlib.h>
 #include<string.h>
 
@@ -17,45 +16,14 @@ node *first=NULL;
 node *last=NULL;
 node *cnode;
 
-void menu(){
-		printf("MENU\n");
-		printf("1.Insert a song in the playlist.\n");
-		printf("2.Delete a song in the playlist.\n");
-		printf("3.Search in the playlist.\n");
-		printf("4.Add a fovorite song.\n");
-		printf("5.View next song.\n");
-		printf("6.View your playist .\n");
-		printf("7.Exit from the program.\n");
-}
-
-void newFile() {
-    remove("songs.txt");
-    FILE *fp = fopen("songs.txt", "w");
-    if (fp == NULL) {
-        printf("Error opening file \n");
-        return;
-    }
-
-    temp = first;
-
-    do {
-        fprintf(fp, "Song Name: %s\n", temp->name);
-        fprintf(fp, "Artist: %s\n", temp->arname);
-        fprintf(fp, "Album: %s\n", temp->album);
-        fprintf(fp, "Duration: %f\n\n", temp->duration);
-
-        temp = temp->next;
-    } while (temp != first);
-
-    fclose(fp);
-}
-
 void bringdata(){
-
 	char name[20];
     float duration;
     char arname[20], album[20];
 	FILE *ftp;
+	
+	first = last = NULL;
+	
 	ftp= fopen("songs.txt", "r");
 	
     if (ftp == NULL) {
@@ -92,13 +60,46 @@ void bringdata(){
         last->next = newnode;
         last = newnode;
     }
-    fscanf(ftp, "\n");
+//    fscanf(ftp, "\n");
     }
     fclose(ftp);
 }
 
-void insert()
-{
+void menu() {
+		printf("MENU\n");
+		printf("1.Insert a song in the playlist.\n");
+		printf("2.Delete a song in the playlist.\n");
+		printf("3.Search in the playlist.\n");
+		printf("4.Add a fovorite song.\n");
+		printf("5.View next song.\n");
+		printf("6.View your playist .\n");
+		printf("7.View your faviourites.\n");
+		printf("8.Exit from the program.\n");
+}
+
+void newFile() {
+    remove("songs.txt");
+    FILE *fp = fopen("songs.txt", "w");
+    if (fp == NULL) {
+        printf("Error opening file \n");
+        return;
+    }
+
+    temp = first;
+
+    do {
+        fprintf(fp, "Song Name: %s\n", temp->name);
+        fprintf(fp, "Artist: %s\n", temp->arname);
+        fprintf(fp, "Album: %s\n", temp->album);
+        fprintf(fp, "Duration: %f\n\n", temp->duration);
+
+        temp = temp->next;
+    } while (temp != first);
+
+    fclose(fp);
+}
+
+void insert() {
 	system("CLS");
 	menu();
 	char name[20];
@@ -155,7 +156,6 @@ void insert()
         last->next = first;
     } 
     printf("Data Entered");
-    
     fprintf(fp, "Song name: %s\nArtist: %s\nAlbum: %s\nDuration: %f\n\n", name, arname, album ,duration);
     fflush(fp);
     fclose(fp);
@@ -176,7 +176,6 @@ void deletion() {
         printf("List is empty!\n");
         return;
     } 
-
         temp = first;
      
         if (strcmp(name, temp->name) == 0) {
@@ -208,7 +207,6 @@ void deletion() {
         if (cnode == last) {
             last = temp;
         }
-        
         printf("Deleted song is: %s\n", cnode->name);
         free(cnode);
         newFile();
@@ -243,39 +241,41 @@ void search() {
     system("CLS");
 }
 
-
 void favorite() {
     char name[20];
-    FILE *fp;
     system("CLS");
     menu();
+    FILE *fp=fopen("fav.txt","a");
+        if (fp == NULL) {
+			printf("Error opening file \n");
+			return;
+		}
     
     if (first == NULL) {
         printf("List is empty!\n");
+        fclose(fp);
         return;
     } 
 	else {
         temp = first;
-        
         printf("Enter song name you want to add to favorites: ");
         scanf(" %19[^\n]", name);
         
-        while (temp != first) {
+        do {
             if (strcmp(name, temp->name) == 0) {
-            	fp=fopen("fav.txt","a");
                 printf("%s is added to favorites!\n", temp->name);
                 fprintf(fp, "Song name: %s\nArtist: %s\nAlbum: %s\nDuration: %f\n\n", temp->name, temp->arname, temp->album ,temp->duration);
-                return;
+                fclose(fp);
+				return;
             }
             temp = temp->next;
-        }
-        
-        if (strcmp(name, temp->name) != 0) {
+        }while(temp != first);
+    
             printf("This song doesn't exist in your playlist!'\n");
-        }
     }
     fclose(fp);
 }
+
 void next() {
     char name[20];
     system("CLS");
@@ -301,13 +301,12 @@ void next() {
                 printf("Album Name: %s\n", nexts->album);
                 printf("Duration: %f\n\n", nexts->duration);
             } 
-			else {
-                printf("\nThis song doesn't exist in your playlist!\n");
-            }
             return;
         }
+        else{
+        	printf("\nThis song doesn't exist in your playlist!\n");
+		}
         temp = temp->next;
-        printf("\nThis song doesn't exist in your playlist!\n");
     }
     if (temp->next == first){
     	nexts = first;
@@ -319,8 +318,7 @@ void next() {
 	}
 }
 
-void display()
-{
+void display(){
     char ch;
 	FILE *ptr;
 	
@@ -334,62 +332,69 @@ void display()
         printf("\nThe songs in your playlist are: \n\n");
  
 		do{
-		
-		ch = fgetc(ptr);
-		putchar(ch);
-		
-	    }while(ch!=EOF);
+			ch = fgetc(ptr);
+			putchar(ch);
+		}while(ch!=EOF);
 	
 		fclose(ptr);
 	}
 
-int main()
-{
+void viewfav(){
+	char ch;
+	FILE *ptr;
+	
+	ptr=fopen("fav.txt", "r");
+	
+	if(ptr == NULL)
+   {
+      printf("FILE NOT FOUND!");  
+      return;             
+   }
+        printf("\nYour favourite songs from your playlist are: \n\n");
+        
+		do{
+		ch = fgetc(ptr);
+		putchar(ch);
+	    } while(ch!=EOF);
+	    
+		fclose(ptr);
+}
+
+int main(){
 	int c;
 	bringdata();
 	menu();
-	
 	do{
 		printf("\nEnter your choice from the menu: ");
 		scanf("%d", &c);
 		switch(c){
 			case 1:
-			{
 				insert();
 				break;
-			}
-			
 			case 2:
-			{
 				deletion();
 				break;
-		}
 			case 3:
-			{
 				search();
 				break;
-			}
 		    case 4:
-        	{
 				favorite();
 				break;
-			}
 			case 5:
-        	{
 				next();
 				break;
-			}
 			case 6:
-			{
 				display();
 				break;
-			}
 			case 7:
-			{
+					viewfav();
+					break;
+			case 8:
 				printf("Quitting the prgram. Perss any key");
 				getch();
 				break;
-			}
+			default:
+				printf("Inavalid Choice");
 		}//end of switch
-	}while(c!=7);
+	}while(c!=8);
 }//end of main
