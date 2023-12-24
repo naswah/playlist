@@ -17,6 +17,29 @@ node *first=NULL;
 node *last=NULL;
 node *cnode;
 
+void newFile() {
+    remove("songs.txt");
+
+    FILE *fp = fopen("songs.txt", "w");
+    if (fp == NULL) {
+        printf("Error opening file \n");
+        return;
+    }
+
+    temp = first;
+
+    do {
+        fprintf(fp, "Song Name: %s\n", temp->name);
+        fprintf(fp, "Artist: %s\n", temp->arname);
+        fprintf(fp, "Album: %s\n", temp->album);
+        fprintf(fp, "Duration: %f\n\n", temp->duration);
+
+        temp = temp->next;
+    } while (temp != first);
+
+    fclose(fp);
+}
+
 void bringdata(){
 
 	char name[20];
@@ -130,6 +153,7 @@ void insert()
         last = newnode;
         last->next = first;
     } 
+    printf("Data Entered");
     fprintf(fp, "Song name: %s\nArtist: %s\nAlbum: %s\nDuration: %f\n\n", name, arname, album ,duration);
     fflush(fp);
     fclose(fp);
@@ -166,6 +190,7 @@ void deletion() {
             last->next = first;
             printf("Deleted song is: %s\n", temp->name);
             free(temp);
+            newFile();
             return;
         }
         
@@ -192,27 +217,7 @@ void deletion() {
         
         printf("Deleted song is: %s\n", cnode->name);
         free(cnode);
-        
-        remove("songs.txt");
-        
-        FILE *fp = fopen("songs.txt", "w");
-	    if (fp == NULL) {
-	        printf("Error opening file \n");
-	        return;
-	    }
-
-    	temp = first;
-
-    do {
-        fprintf(fp, "Song Name: %s\n", temp->name);
-        fprintf(fp, "Artist: %s\n", temp->arname);
-        fprintf(fp, "Album: %s\n", temp->album);
-        fprintf(fp, "Duration: %f\n\n", temp->duration);
-
-        temp = temp->next;
-    } while (temp != first);
-
-    fclose(fp);
+        newFile();
 }
 
 void search() {
