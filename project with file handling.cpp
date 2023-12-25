@@ -89,6 +89,21 @@ void newFile() {
     fclose(fp);
 }
 
+void freelist() {
+    if (first == NULL) {
+        return;
+    }
+    temp = first;
+    do {
+        node *nextnode = temp->next;
+        free(temp);
+        temp = nextnode;
+    } while (temp != first);
+
+    first = NULL;
+    last = NULL;
+}
+
 void insert() {
 	system("CLS");
 	menu();
@@ -377,4 +392,5 @@ int main(){
 				printf("Inavalid Choice");
 		}//end of switch
 	}while(c!=8);
+	freelist();
 }//end of main
