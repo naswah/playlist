@@ -49,9 +49,9 @@ void bringdata(){
         last->next = first;
     } 
 	else {
-		
         last->next = newnode;
         last = newnode;
+        last->next=first;
     }
 //    fscanf(ftp, "\n");
     }
@@ -290,20 +290,14 @@ void next() {
     printf("Enter song name: ");
     scanf(" %20[^\n]", name);
     
-    temp = first;
-    while (temp->next != first) {
+    temp = first; 
+
+	while (temp->next != first) {
         if (strcmp(name, temp->name) == 0) {
             nexts = temp->next;
-            
-            if (nexts != NULL) {
-                printf("\nNext song info: \n");
-                printf("\n%s\n%s\n%s\n%f", nexts->name, nexts->arname, nexts->album, nexts->duration);
-            } 
+            printf("\n%s\n%s\n%s\n%f", nexts->name, nexts->arname, nexts->album, nexts->duration);
             return;
         }
-        else{
-        	printf("\nThis song doesn't exist in your playlist!\n");
-		}
         temp = temp->next;
     }
     if (temp->next == first){
@@ -389,7 +383,7 @@ int main(){
 				getch();
 				break;
 			default:
-				printf("Inavalid Choice");
+				printf("Invalid Choice");
 		}//end of switch
 	}while(c!=8);
 	freelist();
