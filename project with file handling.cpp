@@ -22,7 +22,8 @@ void bringdata(){
     char arname[20], album[20];
 	FILE *ftp;
 	
-	first = last = NULL;
+	first = NULL;
+	last = NULL;
 	
 	ftp= fopen("songs.txt", "r");
 	
@@ -31,24 +32,16 @@ void bringdata(){
         return;
     } 
   
-    while (fscanf(ftp, "Song Name: %[^\n]%*c", name) == 1 &&
-           fscanf(ftp, "Artist: %[^\n]%*c", arname) == 1 &&
-           fscanf(ftp, "Album: %[^\n]%*c", album) == 1 &&
-           fscanf(ftp, "Duration: %f%*c\n\n", &duration) == 1) {  
-
+    while (!feof(ftp)) {  
+    fscanf(ftp, "%s %s %s %f", name, arname, album, &duration);
     newnode = (node *)malloc(sizeof(node));
     
-    if (newnode == NULL) {
-        printf("Memory allocation failed!\n");
-        fclose(ftp);
-        return;
-    }
     strcpy(newnode->name, name);
     strcpy(newnode->arname, arname);
     strcpy(newnode->album, album);
     newnode->duration = duration;
     
-    printf("data brought");
+    printf("data brought\n");
     
     if (first == NULL) {
         first = newnode;
@@ -88,10 +81,7 @@ void newFile() {
     temp = first;
 
     do {
-        fprintf(fp, "Song Name: %s\n", temp->name);
-        fprintf(fp, "Artist: %s\n", temp->arname);
-        fprintf(fp, "Album: %s\n", temp->album);
-        fprintf(fp, "Duration: %f\n\n", temp->duration);
+        fprintf(fp, "\n%s\n%s\n%s\n%f", temp->name, temp->arname, temp->album, temp->duration);
 
         temp = temp->next;
     } while (temp != first);
@@ -156,7 +146,7 @@ void insert() {
         last->next = first;
     } 
     printf("Data Entered");
-    fprintf(fp, "Song name: %s\nArtist: %s\nAlbum: %s\nDuration: %f\n\n", name, arname, album ,duration);
+	fprintf(fp, "\n%s\n%s\n%s\n%f", name, arname, album ,duration);
     fflush(fp);
     fclose(fp);
 }
@@ -168,7 +158,7 @@ void deletion() {
     
 	system("CLS");
     menu();
-		
+    
     printf("Enter song name you want to delete: ");
     scanf(" %20[^\n]", name);
     
@@ -228,10 +218,7 @@ void search() {
     do {
         if (strcmp(name, temp->name) == 0) {
             printf("Song found!\n");
-            printf("Song Name: %s\n", temp->name);
-            printf("Artist Name: %s\n", temp->arname);
-            printf("Album Name: %s\n", temp->album);
-            printf("Duration: %f\n", temp->duration);
+            printf("\n%s\n%s\n%s\n%f", temp->name,temp->arname, temp->album, temp->duration);
             return;
         }
         temp = temp->next;
@@ -264,14 +251,13 @@ void favorite() {
         do {
             if (strcmp(name, temp->name) == 0) {
                 printf("%s is added to favorites!\n", temp->name);
-                fprintf(fp, "Song name: %s\nArtist: %s\nAlbum: %s\nDuration: %f\n\n", temp->name, temp->arname, temp->album ,temp->duration);
+                fprintf(fp, "\n%s\n%s\n%s\n%f", temp->name, temp->arname, temp->album ,temp->duration);
                 fclose(fp);
 				return;
             }
             temp = temp->next;
+            printf("This song doesn't exist in your playlist.");
         }while(temp != first);
-    
-            printf("This song doesn't exist in your playlist!'\n");
     }
     fclose(fp);
 }
@@ -296,10 +282,7 @@ void next() {
             
             if (nexts != NULL) {
                 printf("\nNext song info: \n");
-                printf("Song Name: %s\n", nexts->name);
-                printf("Artist Name: %s\n", nexts->arname);
-                printf("Album Name: %s\n", nexts->album);
-                printf("Duration: %f\n\n", nexts->duration);
+                printf("\n%s\n%s\n%s\n%f", nexts->name, nexts->arname, nexts->album, nexts->duration);
             } 
             return;
         }
@@ -311,10 +294,7 @@ void next() {
     if (temp->next == first){
     	nexts = first;
     	printf("\nNext song info: \n");
-                printf("Song Name: %s\n", first->name);
-                printf("Artist Name: %s\n", first->arname);
-                printf("Album Name: %s\n", first->album);
-                printf("Duration: %f\n\n", first->duration);
+                printf("\n%s\n%s\n%s\n%f", first->name, first->arname, first->album, first->duration);
 	}
 }
 
@@ -362,8 +342,8 @@ void viewfav(){
 
 int main(){
 	int c;
-	bringdata();
-	menu();
+    bringdata();
+    menu();
 	do{
 		printf("\nEnter your choice from the menu: ");
 		scanf("%d", &c);
@@ -387,8 +367,8 @@ int main(){
 				display();
 				break;
 			case 7:
-					viewfav();
-					break;
+				viewfav();
+				break;
 			case 8:
 				printf("Quitting the prgram. Perss any key");
 				getch();
