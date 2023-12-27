@@ -3,10 +3,10 @@
 #include<string.h>
 
 struct playlist{
-	char name[20];
-	float duration;
-	char arname[20], album[20];
-	struct playlist *next;
+  char name[20];
+  float duration;
+  char arname[20], album[20];
+  struct playlist *next;
 };
 
 typedef struct playlist node;
@@ -15,78 +15,76 @@ node *temp;
 node *first=NULL;
 node *last=NULL;
 node *cnode;
+int count=0;
 
 void bringdata(){
-	char name[20];
+  char name[20];
     float duration;
     char arname[20], album[20];
-	FILE *ftp;
-	
-	first = NULL;
-	last = NULL;
-	
-	ftp= fopen("songs.txt", "r");
-	
+  FILE *ftp;
+
+  first = NULL;
+  last = NULL;
+
+  ftp= fopen("songs.txt", "r");
+
     if (ftp == NULL) {
         printf("FILE NOT FOUND!");
         return;
-    } 
-  
-    while (!feof(ftp)) {  
-    fscanf(ftp, "%s %s %s %f", name, arname, album, &duration);
+    }
+    while (fscanf(ftp, "%s %s %s %f", name, arname, album, &duration) == 4) {  
+
     newnode = (node *)malloc(sizeof(node));
-    
+
     strcpy(newnode->name, name);
     strcpy(newnode->arname, arname);
     strcpy(newnode->album, album);
     newnode->duration = duration;
-    
-    printf("data brought\n");
-    
+    count++;
+
     if (first == NULL) {
         first = newnode;
         last = newnode;
         last->next = first;
     } 
-	else {
+  else {
         last->next = newnode;
         last = newnode;
+        
         last->next=first;
     }
-//    fscanf(ftp, "\n");
     }
     fclose(ftp);
 }
 
 void menu() {
-		printf("MENU\n");
-		printf("1.Insert a song in the playlist.\n");
-		printf("2.Delete a song in the playlist.\n");
-		printf("3.Search in the playlist.\n");
-		printf("4.Add a fovorite song.\n");
-		printf("5.View next song.\n");
-		printf("6.View your playist .\n");
-		printf("7.View your faviourites.\n");
-		printf("8.Exit from the program.\n");
+    printf("MENU\n");
+    printf("1.Insert a song in the playlist.\n");
+    printf("2.Delete a song in the playlist.\n");
+    printf("3.Search in the playlist.\n");
+    printf("4.View next song.\n");
+    printf("5.View your playist .\n");
+    printf("6.Exit from the program.\n");
 }
 
 void newFile() {
-    remove("songs.txt");
-    FILE *fp = fopen("songs.txt", "w");
-    if (fp == NULL) {
-        printf("Error opening file \n");
-        return;
-    }
+  remove("songs.txt");
+  FILE *fp = fopen("songs.txt", "w");
+  if (fp == NULL) {
+    printf("Error opening file \n");
+    return;
+  }
 
-    temp = first;
+  temp = first;
 
-    do {
-        fprintf(fp, "\n%s\n%s\n%s\n%f", temp->name, temp->arname, temp->album, temp->duration);
+ do{
+ 
+    fprintf(fp, "%s\n%s\n%s\n%f\n", temp->name, temp->arname, temp->album, temp->duration);
+    temp = temp->next;
+    
+  }   while (temp != first);
 
-        temp = temp->next;
-    } while (temp != first);
-
-    fclose(fp);
+  fclose(fp); 
 }
 
 void freelist() {
@@ -105,34 +103,34 @@ void freelist() {
 }
 
 void insert() {
-	system("CLS");
-	menu();
-	char name[20];
+  system("CLS");
+  menu();
+  char name[20];
     float duration;
     char arname[20], album[20];
-	FILE *fp;
-	
-	fp= fopen("songs.txt", "a");
-	
-	if (fp == NULL) {
+  FILE *fp;
+
+  fp= fopen("songs.txt", "a");
+
+  if (fp == NULL) {
         printf("Error opening file!\n");
         return;
     }
-    
+
     printf("\nEnter song name: ");
     scanf(" %19[^\n]", name);
-    
+
     printf("Enter artist name: ");
     scanf(" %19[^\n]", arname);
-    
+
     printf("Enter album name: ");
     scanf(" %19[^\n]", album);
-    
+
     printf("Enter duration: ");
     scanf("%f", &duration);
 
     newnode = (node *)malloc(sizeof(node));
-    
+
     if (newnode == NULL) {
         printf("Memory allocation failed!\n");
         fclose(fp);
@@ -148,73 +146,94 @@ void insert() {
         first = newnode;
         last = newnode;
         last->next = first;
+        count++;
     } 
-	else {
-        temp = first;
-        
-        while (temp->next != first) {
-            temp = temp->next;
-        }
-        last = temp;
+  else {
         last->next = newnode;
         last = newnode;
-        last->next = first;
-    } 
+        last->next=first;
+        count++;
+    }
+
     printf("Data Entered");
-	fprintf(fp, "\n%s\n%s\n%s\n%f", name, arname, album ,duration);
+    fprintf(fp, "%s\n%s\n%s\n%f\n", name, arname, album ,duration);
     fflush(fp);
     fclose(fp);
 }
 
 void deletion() {
-	char name[20];
-    float duration;
-    char arname[20], album[20];
-    
-	system("CLS");
+  char name[20];
+  int num;
+  num=count;
+    system("CLS");
     menu();
-    
-    printf("Enter song name you want to delete: ");
-    scanf(" %20[^\n]", name);
-    
+
     if (first == NULL) {
         printf("List is empty!\n");
         return;
     } 
-        temp = first;
-     
-        if (strcmp(name, temp->name) == 0) {
-            first = first->next;
-            last->next = first;
-            printf("Deleted song is: %s\n", temp->name);
-            free(temp);
-            newFile();
-            return;
-        }
-        
-        // node to delete
-        while (temp->next != first) {
-            if (strcmp(name, temp->next->name) == 0) {
-                break; // found 
-            }
-            temp = temp->next;
-        }
 
-        if (temp->next == first) {
-            printf("Invalid song name\n");
-            return;
-        }
-        
-        // delete the node
-        cnode = temp->next;
-        temp->next = cnode->next;
-        
-        if (cnode == last) {
-            last = temp;
-        }
-        printf("Deleted song is: %s\n", cnode->name);
-        free(cnode);
-        newFile();
+    printf("Enter song name you want to delete: ");
+    scanf(" %19[^\n]", name); 
+	
+    temp=first;
+	
+    while(num!=0){
+    	if (strcmp(temp->name,name)==0){
+    		break;
+		}
+		temp=temp->next;
+		num--;
+	}
+	
+   if(num==0){
+   	printf("Invalid Choice!");
+   	return;
+   }
+   
+  else{
+	   	temp=first;
+	   	if(count==1){
+	   	     	
+	            first = NULL;
+	            last = NULL;
+	            printf("Deleted song is: %s\n", temp->name);
+	            free(temp);
+	            count--;
+	            
+	            remove("songs.txt");
+	            
+	            FILE *ftp=fopen("songs.txt", "w");
+	            fclose(ftp);
+	        
+	        } 
+	        
+	        else if(strcmp(temp->name,name)==0){
+	        	first=first->next;
+	        	last->next=first;
+	        	printf("Deleted song is: %s\n", temp->name);
+		        count--;
+		        free(temp);
+		        newFile();
+			}
+			
+	        else{
+			   	while (temp->next!= first) {
+		            if (strcmp(name, temp->next->name) == 0) {
+		                break; // found 
+		            }
+		            temp = temp->next;
+		        }
+		
+		        cnode = temp->next;
+		        temp->next = cnode->next;
+		        
+			    printf("Deleted song is: %s\n", cnode->name);
+		        count--;
+		        free(cnode);
+		        newFile();
+	        }
+    }   
 }
 
 void search() {
@@ -225,63 +244,30 @@ void search() {
         printf("The playlist is empty!\n");
         return;
     }
-    
+
     printf("Enter song name to search: ");
     scanf(" %20[^\n]", name);
-    
+
     temp = first;
     do {
         if (strcmp(name, temp->name) == 0) {
             printf("Song found!\n");
-            printf("\n%s\n%s\n%s\n%f", temp->name,temp->arname, temp->album, temp->duration);
+            printf("\nSong Name: %s\nArtist Name: %s\nAlbum: %s\nDuration: %f", temp->name,temp->arname, temp->album, temp->duration);
             return;
         }
         temp = temp->next;
     } while (temp != first);
-    
-    printf("Song not found.\n");
-    system("CLS");
-}
 
-void favorite() {
-    char name[20];
-    system("CLS");
-    menu();
-    FILE *fp=fopen("fav.txt","a");
-        if (fp == NULL) {
-			printf("Error opening file \n");
-			return;
-		}
-    
-    if (first == NULL) {
-        printf("List is empty!\n");
-        fclose(fp);
-        return;
-    } 
-	else {
-        temp = first;
-        printf("Enter song name you want to add to favorites: ");
-        scanf(" %19[^\n]", name);
-        
-        do {
-            if (strcmp(name, temp->name) == 0) {
-                printf("%s is added to favorites!\n", temp->name);
-                fprintf(fp, "\n%s\n%s\n%s\n%f", temp->name, temp->arname, temp->album ,temp->duration);
-                fclose(fp);
-				return;
-            }
-            temp = temp->next;
-            printf("This song doesn't exist in your playlist.");
-        }while(temp != first);
-    }
-    fclose(fp);
-}
+    printf("Song not found.\n");
+} 
 
 void next() {
     char name[20];
     system("CLS");
     menu();
     node *nexts;
+    int num=count;
+
     if (first == NULL) {
         printf("List is empty!\n");
         return;
@@ -289,102 +275,75 @@ void next() {
 
     printf("Enter song name: ");
     scanf(" %20[^\n]", name);
-    
-    temp = first; 
 
-	while (temp->next != first) {
-        if (strcmp(name, temp->name) == 0) {
-            nexts = temp->next;
-            printf("\n%s\n%s\n%s\n%f", nexts->name, nexts->arname, nexts->album, nexts->duration);
-            return;
-        }
-        temp = temp->next;
+    temp = first; 
+    while(num!=0){
+      if(strcmp(name,temp->name)==0){
+        nexts=temp->next;
+        printf("\nNext Song Info:\n");
+        printf("\n%s\n%s\n%s\n%f", nexts->name,nexts->arname, nexts->album , nexts->duration);
+        return;
     }
-    if (temp->next == first){
-    	nexts = first;
-    	printf("\nNext song info: \n");
-                printf("\n%s\n%s\n%s\n%f", first->name, first->arname, first->album, first->duration);
-	}
+    temp=temp->next;
+    num--;
+  }
+
+    if(num==0){
+      printf("This song doesn't exist in your playlist!");
+  }
 }
 
 void display(){
-    char ch;
-	FILE *ptr;
-	
-	ptr=fopen("songs.txt", "r");
-	
-	if(ptr == NULL)
-   {
-      printf("FILE NOT FOUND!");  
-      return;             
-   }
-        printf("\nThe songs in your playlist are: \n\n");
- 
-		do{
-			ch = fgetc(ptr);
-			putchar(ch);
-		}while(ch!=EOF);
-	
-		fclose(ptr);
-	}
+  FILE *ptr;
+  char name[20];
+    float duration;
+    char arname[20], album[20];
 
-void viewfav(){
-	char ch;
-	FILE *ptr;
-	
-	ptr=fopen("fav.txt", "r");
-	
-	if(ptr == NULL)
+  ptr=fopen("songs.txt", "r");
+
+  if(ptr == NULL)
    {
       printf("FILE NOT FOUND!");  
       return;             
    }
-        printf("\nYour favourite songs from your playlist are: \n\n");
-        
-		do{
-		ch = fgetc(ptr);
-		putchar(ch);
-	    } while(ch!=EOF);
-	    
-		fclose(ptr);
+  printf("\nThe songs in your playlist are: \n");
+
+  while (fscanf(ptr, "%s %s %s %f", &name, &arname, &album, &duration)==4) {
+         printf("\nSong Name: %s\nArtist Name: %s\nAlbum: %s\nDuration: %f\n", name, arname,album, duration);
+  }
+  
+    fclose(ptr);
 }
 
 int main(){
-	int c;
+  int c;
     bringdata();
     menu();
-	do{
-		printf("\nEnter your choice from the menu: ");
-		scanf("%d", &c);
-		switch(c){
-			case 1:
-				insert();
-				break;
-			case 2:
-				deletion();
-				break;
-			case 3:
-				search();
-				break;
-		    case 4:
-				favorite();
-				break;
-			case 5:
-				next();
-				break;
-			case 6:
-				display();
-				break;
-			case 7:
-				viewfav();
-				break;
-			case 8:
-				printf("Quitting the prgram. Perss any key");
-				getch();
-				break;
-			default:
-				printf("Invalid Choice");
-		}//end of switch
-	}while(c!=8);
-	freelist();
+  do{
+    printf("\nEnter your choice from the menu: ");
+    scanf("%d", &c);
+    switch(c){
+      case 1:
+        insert();
+        break;
+      case 2:
+        deletion();
+        break;
+      case 3:
+        search();
+        break;
+        case 4:
+          next();
+          break;
+      case 5:
+        display();
+        break;
+      case 6:
+        printf("Quitting the prgram. Perss any key");
+        break;
+      default:
+        printf("Invalid Choice");
+    }//end of switch
+  }while(c!=6);
+  freelist();
 }//end of main
